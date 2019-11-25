@@ -23,6 +23,8 @@ class Environment:
 
     def get_repo(self,start_date,end_date,codes_num,market):
         #preprocess parameters
+        sample_minimum = 200
+        loop_max = 3
 
         #read all data
         self.data=pd.read_csv(r'./data/'+market+'.csv',index_col=0,parse_dates=True,dtype=object)
@@ -39,8 +41,12 @@ class Environment:
             date_set=set(data2.loc[data2['code']==codes[0]].index)
             for code in codes:
                 date_set=date_set.intersection((set(data2.loc[data2['code']==code].index)))
-            if len(date_set)>1200:
+            loop_count += 1
+            if len(date_set)> sample_minimum or loop_count >= loop_max:
                 sample_flag=False
+
+        if len(date_set) < sample_minimum:
+            print("Warning: Sample size is too small")
 
         date_set=date_set.intersection(set(pd.date_range(start_date,end_date)))
         self.date_set = list(date_set)
