@@ -297,7 +297,7 @@ def session(config,args):
 def build_parser():
     parser = ArgumentParser(description='Provide arguments for training different DDPG or PPO models in Portfolio Management')
     parser.add_argument("--mode",choices=['train','test','download'])
-    parser.add_argument("--num",type=int)
+    parser.add_argument("--num",type=int, default=0)
     return parser
 
 
