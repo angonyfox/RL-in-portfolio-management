@@ -1,0 +1,7 @@
+pandas
+tensorflow==1.15.0
+tflearn
+seaborn
+tushare
+lxml
+bs4
