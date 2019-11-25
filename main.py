@@ -200,7 +200,7 @@ def parse_config(config,mode):
     print("*--------------------Training Status-------------------*")
     print("Date from",start_date,' to ',end_date)
     print('Features:',features)
-    print("Agent:Noise(",noise_flag,')---Recoed(',noise_flag,')---Plot(',plot_flag,')')
+    print("Agent:Noise(",noise_flag,')---Record(',noise_flag,')---Plot(',plot_flag,')')
     print("Market Type:",market)
     print("Predictor:",predictor,"  Framework:", framework,"  Window_length:",window_length)
     print("Epochs:",epochs)
