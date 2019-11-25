@@ -238,8 +238,10 @@ def session(config,args):
     PATH_prefix = "result/PG/" + str(args['num']) + '/'
 
     if args['mode']=='train':
-        if not os.path.exists(PATH_prefix):
-            os.makedirs(PATH_prefix)
+        if not os.path.exists(PATH_prefix) or not os.path.exists(os.path.join(PATH_prefix, "config.json")):
+            if not os.path.exists(PATH_prefix):
+                os.makedirs(PATH_prefix)
+            print("Prepare Data...")
             train_start_date, train_end_date, test_start_date, test_end_date, codes = env.get_repo(start_date, end_date,
                                                                                                    codes, market)
             env.get_data(train_start_date, train_end_date, features, window_length, market, codes)
