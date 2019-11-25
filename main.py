@@ -263,7 +263,7 @@ def session(config,args):
                 dict_data['train_end_date'], '%Y-%m-%d'), dict_data['codes']
             env.get_data(train_start_date, train_end_date, features, window_length, market, codes)
 
-        for noise_flag in ['True']:#['False','True'] to train agents with noise and without noise in assets prices
+        for noise_flag in ['False', 'True']:#['False','True'] to train agents with noise and without noise in assets prices
             if framework == 'PG':
                 print("*-----------------Loading PG Agent---------------------*")
                 agent = PG(len(codes) + 1, int(window_length), len(features), '-'.join(agent_config), reload_flag,
