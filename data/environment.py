@@ -33,6 +33,7 @@ class Environment:
             self.data["code"]=self.data["code"].apply(fill_zeros)
 
         sample_flag=True
+        loop_count = 0
         while sample_flag:
             codes=random.sample(set(self.data["code"]),codes_num)
             data2=self.data.loc[self.data["code"].isin(codes)]
@@ -83,7 +84,7 @@ class Environment:
             asset_data=data[data["code"]==asset].reindex(self.date_set).sort_index()#加入时间的并集，会产生缺失值pd.to_datetime(self.date_list)
             asset_data=asset_data.resample('D').mean()
             asset_data['close']=asset_data['close'].fillna(method='pad')
-            base_price = asset_data.ix[-1, 'close']
+            base_price = asset_data.loc[asset_data.index[-1], 'close']
             asset_dict[str(asset)]= asset_data
             asset_dict[str(asset)]['close'] = asset_dict[str(asset)]['close'] / base_price
 
@@ -122,14 +123,14 @@ class Environment:
             state=[]
             for asset in codes:
                 asset_data=asset_dict[str(asset)]
-                V_close = np.vstack((V_close, asset_data.ix[t - self.L - 1:t - 1, 'close']))
+                V_close = np.vstack((V_close, asset_data.loc[asset_data.index[t - self.L - 1:t - 1], 'close']))
                 if 'high' in features:
-                    V_high=np.vstack((V_high,asset_data.ix[t-self.L-1:t-1,'high']))
+                    V_high=np.vstack((V_high,asset_data.loc[asset_data.index[t-self.L-1:t-1],'high']))
                 if 'low' in features:
-                    V_low=np.vstack((V_low,asset_data.ix[t-self.L-1:t-1,'low']))
+                    V_low=np.vstack((V_low,asset_data.loc[asset_data.index[t-self.L-1:t-1],'low']))
                 if 'open' in features:
-                    V_open=np.vstack((V_open,asset_data.ix[t-self.L-1:t-1,'open']))
-                y=np.vstack((y,asset_data.ix[t,'close']/asset_data.ix[t-1,'close']))
+                    V_open=np.vstack((V_open,asset_data.loc[asset_data.index[t-self.L-1:t-1],'open']))
+                y=np.vstack((y,asset_data.loc[asset_data.index[t],'close']/asset_data.loc[asset_data.index[t-1],'close']))
             state.append(V_close)
             if 'high' in features:
                 state.append(V_high)
