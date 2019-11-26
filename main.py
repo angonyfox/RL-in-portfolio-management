@@ -49,14 +49,17 @@ class StockTrader():
         self.w_history.extend([','.join([str(Decimal(str(w0)).quantize(Decimal('0.00'))) for w0 in w.tolist()[0]])])
         self.p_history.extend([','.join([str(Decimal(str(p0)).quantize(Decimal('0.000'))) for p0 in p.tolist()])])
 
-    def write(self,codes,agent):
+    def write(self,epoch,codes,agent):
         global PATH_prefix
         wealth_history = pd.Series(self.wealth_history)
         r_history = pd.Series(self.r_history)
         w_history = pd.Series(self.w_history)
         p_history = pd.Series(self.p_history)
         history = pd.concat([wealth_history, r_history, w_history, p_history], axis=1)
-        history.to_csv(PATH_prefix+agent + '-'.join(codes) + '-' + str(math.exp(np.sum(self.r_history)) * 100) + '.csv')
+        history_path = os.path.join(PATH_prefix, "history")
+        if not os.path.exists(history_path):
+            os.mkdir(history_path)
+        history.to_csv(os.path.join(history_path, "{}_Ep{}_{}_{}.csv".format(agent, epoch, '-'.join(codes), math.exp(np.sum(self.r_history)) * 100)))
 
     def print_result(self,epoch,agent,noise_flag):
         self.total_reward=math.exp(self.total_reward) * 100
@@ -284,7 +287,7 @@ def session(config,args):
                 traversal(stocktrader,agent,env,epoch,noise,framework,method,trainable)
 
                 if record_flag=='True':
-                    stocktrader.write(epoch,framework)
+                    stocktrader.write(epoch, codes, framework)
 
                 if plot_flag=='True':
                     stocktrader.plot_result()
