@@ -20,13 +20,13 @@ class PG:
         self.number=str(number)
         self.type=type
         # Build up models
-        self.sesson = tf.Session()
+        self.session = tf.Session()
 
         # Initial input shape
         self.M = M
         self.L = L
         self.N = N
-        self.global_step = tf.Variable(0, trainable=False)
+        self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         self.state,self.w_previous,self.out=self.build_net()
         self.future_price=tf.placeholder(tf.float32,[None]+[self.M])
@@ -46,21 +46,21 @@ class PG:
                 print('./saved_network/PG/'+type+'/')
                 if checkpoint and checkpoint.model_checkpoint_path:
                     tf.reset_default_graph()
-                    self.saver.restore(self.sesson, checkpoint.model_checkpoint_path)
+                    self.saver.restore(self.session, checkpoint.model_checkpoint_path)
                     print("Successfully loaded:", checkpoint.model_checkpoint_path)
                 else:
                     print("Could not find old network weights")
-                    self.sesson.run(tf.global_variables_initializer())
+                    self.session.run(tf.global_variables_initializer())
 
             except:
                 print("Could not find old network weights")
-                self.sesson.run(tf.global_variables_initializer())
+                self.session.run(tf.global_variables_initializer())
         else:
-            self.sesson.run(tf.global_variables_initializer())
+            self.session.run(tf.global_variables_initializer())
 
         if trainable == 'True':
             # Initial summary
-            self.summary_writer = tf.summary.FileWriter('./result/PG/'+self.number+'/'+'summary/'+type+'/', self.sesson.graph)
+            self.summary_writer = tf.summary.FileWriter('./result/PG/'+self.number+'/'+'summary/'+type+'/', self.session.graph)
             self.summary_ops, self.summary_vars = self.build_summaries()
 
 
@@ -100,7 +100,7 @@ class PG:
 
     # 选行为 (有改变)
     def predict(self,s,a_previous):
-        return self.sesson.run(self.out,feed_dict={self.state:s,self.w_previous:a_previous})
+        return self.session.run(self.out,feed_dict={self.state:s,self.w_previous:a_previous})
 
     # 存储回合 transition (有改变)
     def save_transition(self, s, p, action,action_previous):
@@ -109,7 +109,7 @@ class PG:
     # 学习更新参数 (有改变)
     def train(self):
         s,p,a,a_previous=self.get_buffer()
-        profit,_=self.sesson.run([self.profit,self.optimize],feed_dict={self.state:s,self.out:np.reshape(a,(-1,self.M)),self.future_price:np.reshape(p,(-1,self.M)),self.w_previous:np.reshape(a_previous,(-1,self.M))})
+        profit,_=self.session.run([self.profit,self.optimize],feed_dict={self.state:s,self.out:np.reshape(a,(-1,self.M)),self.future_price:np.reshape(p,(-1,self.M)),self.w_previous:np.reshape(a_previous,(-1,self.M))})
 
     def get_buffer(self):
         s = [data[0][0] for data in self.buffer]
@@ -125,16 +125,16 @@ class PG:
         path='./result/PG/'+self.number+'/'+'saved_network/'+self.type+'/'
         if not os.path.exists(path):
             os.makedirs(path)
-        self.saver.save(self.sesson,path+self.name,global_step=self.global_step)
+        self.saver.save(self.session,path+self.name,global_step=self.global_step)
 
     def write_summary(self,reward):
-        summary_str = self.sesson.run(self.summary_ops, feed_dict={
+        summary_str = self.session.run(self.summary_ops, feed_dict={
             self.summary_vars[0]: reward,
         })
-        self.summary_writer.add_summary(summary_str, self.sesson.run(self.global_step))
+        self.summary_writer.add_summary(summary_str, self.session.run(self.global_step))
 
     def close(self):
-        self.sesson.close()
+        self.session.close()
 
     def build_summaries(self):
         self.reward = tf.Variable(0.)
