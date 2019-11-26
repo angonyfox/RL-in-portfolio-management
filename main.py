@@ -263,16 +263,25 @@ def session(config,args):
                 dict_data['train_end_date'], '%Y-%m-%d'), dict_data['codes']
             env.get_data(train_start_date, train_end_date, features, window_length, market, codes)
 
-        for noise_flag in ['False', 'True']:#['False','True'] to train agents with noise and without noise in assets prices
+        # Train agents with noise and without noise in assets prices
+        train_noise = []
+        if noise_flag.lower() == 'true':
+            train_noise.append('True')
+        else:
+            train_noise.append('False')
+            if noise_flag.lower() == 'both':
+                train_noise.append('True')
+
+        for noise in train_noise:
             if framework == 'PG':
                 print("*-----------------Loading PG Agent---------------------*")
                 agent = PG(len(codes) + 1, int(window_length), len(features), '-'.join(agent_config), reload_flag,
-                           trainable,noise_flag,args['num'])
+                           trainable,noise,args['num'])
 
             print("Training with {:d}".format(epochs))
             for epoch in range(epochs):
                 print("Now we are at epoch", epoch)
-                traversal(stocktrader,agent,env,epoch,noise_flag,framework,method,trainable)
+                traversal(stocktrader,agent,env,epoch,noise,framework,method,trainable)
 
                 if record_flag=='True':
                     stocktrader.write(epoch,framework)
@@ -281,7 +290,7 @@ def session(config,args):
                     stocktrader.plot_result()
 
                 agent.reset_buffer()
-                stocktrader.print_result(epoch,agent,noise_flag)
+                stocktrader.print_result(epoch,agent,noise)
                 stocktrader.reset()
             agent.close()
             del agent
