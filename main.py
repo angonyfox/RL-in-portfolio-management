@@ -278,9 +278,9 @@ def session(config,args):
                 agent = PG(len(codes) + 1, int(window_length), len(features), '-'.join(agent_config), reload_flag,
                            trainable,noise,args['num'])
 
-            print("Training with {:d}".format(epochs))
+            print("Training with {:d} episode(s)".format(epochs))
             for epoch in range(epochs):
-                print("Now we are at epoch", epoch)
+                # print("Now we are at epoch", epoch)
                 traversal(stocktrader,agent,env,epoch,noise,framework,method,trainable)
 
                 if record_flag=='True':

@@ -43,7 +43,7 @@ class PG:
             try:
 
                 checkpoint = tf.train.get_checkpoint_state('./result/PG/'+self.number+'/'+'saved_network/'+type+'/')
-                print('./saved_network/PG/'+type+'/')
+                print('./PG/{}/saved_network/{}/'.format(self.number, type))
                 if checkpoint and checkpoint.model_checkpoint_path:
                     tf.reset_default_graph()
                     self.saver.restore(self.session, checkpoint.model_checkpoint_path)
